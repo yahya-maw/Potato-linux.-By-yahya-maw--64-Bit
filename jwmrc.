@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<JWM>
+    <WindowStyle>
+        <Font>Roboto-10:bold</Font>
+        <Width>2</Width>
+        <Height>24</Height>
+        <Active><Text>#FFFFFF</Text><Title>#1A1A1A</Title><Outline>#444444</Outline></Active>
+        <Inactive><Text>#888888</Text><Title>#000000</Title><Outline>#222222</Outline></Inactive>
+    </WindowStyle>
+
+    <Tray x="0" y="-1" height="32" background="#000000" opacity="0.8">
+        <TrayButton label=" 🚀 ">root:1</TrayButton>
+        <TaskList style="flat"/>
+        <Dock/>
+        <Clock format="%I:%M %p">Roboto-10</Clock>
+    </Tray>
+
+    <RootMenu onroot="1">
+        <Program icon="terminal" label="الـ Terminal">x-terminal-emulator</Program>
+        <Program icon="folder" label="مدير الملفات">pcmanfm</Program>
+        <Separator/>
+        <Restart label="تحديث الواجهة"/>
+        <Exit label="خروج" confirm="true"/>
+    </RootMenu>
+</JWM>
