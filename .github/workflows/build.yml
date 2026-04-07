@@ -1,0 +1,46 @@
+name: Build Ultra Linux ISO
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Build Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mtools xorriso debootstrap squashfs-tools grub-pc-bin grub-efi-amd64-bin linux-image-amd64
+
+      - name: Build Base System
+        run: |
+          mkdir -p chroot
+          sudo debootstrap --variant=minbase --arch=amd64 stable chroot http://deb.debian.org/debian/
+          # ضبط اليوزر والباسورد (اليوزر: admin | الباسورد: admin)
+          sudo chroot chroot /bin/bash -c "useradd -m -s /bin/bash admin && echo 'admin:admin' | chpasswd"
+          sudo chroot chroot /bin/bash -c "echo 'root:admin' | chpasswd"
+
+      - name: Inject UI and Scripts
+        run: |
+          sudo cp .jwmrc chroot/etc/skel/
+          sudo cp wallpaper.jpg chroot/etc/skel/.wallpaper.jpg
+          sudo cp install.sh chroot/root/
+          # سطر التشغيل التلقائي للواجهة عند الدخول
+          sudo bash -c "echo 'if [[ -z \$DISPLAY && \$XDG_VTNR -eq 1 ]]; then exec startx; fi' >> chroot/etc/skel/.bash_profile"
+          # تنفيذ سكريبت التثبيت الداخلي
+          sudo chroot chroot /bin/bash -c "chmod +x /root/install.sh && /root/install.sh"
+
+      - name: Create ISO Image
+        run: |
+          mkdir -p output
+          sudo grub-mkrescue -o output/Ultra-Linux-Core.iso chroot
+
+      - name: Upload Finished ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ultra-Linux-ISO
+          path: output/Ultra-Linux-Core.iso
